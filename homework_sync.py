@@ -79,8 +79,8 @@ def parse_and_sync_locally():
     md_content = "\n".join(md_lines)
 
 # Direkt lokal in den Vault schreiben
-    target_dir = "/home/marlon/docker/nextcloud/data/marlon/files/orga_vault/00 Meta/Hausaufgaben"
-    
+    target_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
+    os.makedirs(target_dir, exist_ok=True)
     filename = f"{iso_datum}.md"
     file_path = os.path.join(target_dir, filename)
 
