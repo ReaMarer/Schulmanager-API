@@ -1,0 +1,42 @@
+{
+    "Montag": [
+        "IF",
+        "M",
+        "M",
+        "L7-1",
+        "E5",
+        "LC"
+    ],
+    "Dienstag": [
+        "M",
+        "PP-2",
+        "BI",
+        "BI",
+        "L7-1",
+        "L7-1"
+    ],
+    "Mittwoch": [
+        "D",
+        "PP-2",
+        "CH",
+        "CH",
+        "EK",
+        "EK"
+    ],
+    "Donnerstag": [
+        "E5",
+        "E5",
+        "SP",
+        "SP",
+        "D",
+        "D",
+        "PH",
+        "PH"
+    ],
+    "Freitag": [
+        "IF",
+        "IF",
+        "GE",
+        "GE"
+    ]
+}
