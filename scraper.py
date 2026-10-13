@@ -4,7 +4,7 @@ from playwright.async_api import async_playwright
 async def scrape_homework():
     async with async_playwright() as p:
         print("[Scraper] Starte Browser...")
-        browser = await p.chromium.launch(headless=False) # Auf True setzen, falls das Fenster stört
+        browser = await p.chromium.launch(headless=True) # Auf True setzen, falls das Fenster stört
         context = await browser.new_context()
         page = await context.new_page()
 
