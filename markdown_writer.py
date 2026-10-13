@@ -35,12 +35,31 @@ def is_lesson_cancelled(check_date_str, subject):
 def get_next_lesson_date(current_date_obj, subject):
     """
     Ermittelt das Datum der nächsten Unterrichtsstunde basierend auf der stundenplan.json.
-    Berücksichtigt jetzt auch den vorbereiteten Entfall-Mechanismus.
+    Berücksichtigt das Fächer-Mapping und den Entfall-Mechanismus.
     """
     stundenplan = load_json_safely("stundenplan.json")
     if not stundenplan:
         print("[MarkdownWriter] Warnung: 'stundenplan.json' nicht gefunden. Verwende morgiges Datum als Fallback.")
         return current_date_obj + timedelta(days=1)
+
+    # Mapping von Schulmanager-HTML-Namen auf deine stundenplan.json-Namen
+    fach_mapping = {
+        "PRAKTISCHE PHIL.": "Praktische Philosophie",
+        "Mathematik": "Mathematik",
+        "Englisch": "Englisch",
+        "Deutsch": "Deutsch",
+        "Chemie": "Chemie",
+        "Erdkunde": "Erdkunde",
+        "Sport": "Sport",
+        "Physik": "Physik",
+        "Informatik": "Informatik",
+        "Geschichte": "Geschichte",
+        "Biologie": "Biologie",
+        "Lateinisch, regulärer Beginn in Jahrgang 7": "Latein"
+    }
+    
+    # Fach über das Mapping bereinigen, falls nötig
+    mapped_subject = fach_mapping.get(subject, subject)
 
     wochentage_mapping = {
         0: "Montag", 1: "Dienstag", 2: "Mittwoch",
@@ -60,10 +79,10 @@ def get_next_lesson_date(current_date_obj, subject):
         weekday_name = wochentage_mapping.get(check_weekday_index)
         
         # 1. Prüfen, ob das Fach überhaupt an diesem Wochentag laut Stundenplan stattfindet
-        if weekday_name in stundenplan and subject in stundenplan[weekday_name]:
+        if weekday_name in stundenplan and mapped_subject in stundenplan[weekday_name]:
             
             # 2. [ZUKUNFTS-ANSAATZ] Hier greift die Entfall-Prüfung
-            if is_lesson_cancelled(check_date_str, subject):
+            if is_lesson_cancelled(check_date_str, mapped_subject):
                 continue # Überspringt diesen Tag und sucht den nächsten gültigen Termin
                 
             return check_date
@@ -77,7 +96,7 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
     aus dem Stundenplan (inkl. Entfall-Vorbereitung) und schreibt sie in eine Markdown-Datei.
     Behält dabei bereits abgehakte Aufgaben (Merge-Logik) bei.
     """
-    # Zielpfad definieren
+    # Zielpfad auf dem Ubuntu-Server (Nextcloud / Vault)
     target_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
     os.makedirs(target_dir, exist_ok=True)
     filename = f"{iso_datum}.md"
@@ -127,7 +146,7 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
                 subject = h4.text.strip()
                 task = p.text.strip() if p else "Keine Beschreibung"
 
-                # Nächstes echtes Unterrichtsdatum (unter Berücksichtigung von Entfällen) berechnen
+                # Nächstes echtes Unterrichtsdatum (unter Berücksichtigung von Entfällen & Mapping) berechnen
                 next_lesson_date = get_next_lesson_date(current_date_obj, subject)
                 due_date_str = next_lesson_date.strftime("%Y-%m-%d")
 
@@ -152,4 +171,4 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    print(f"[MarkdownWriter] Hausaufgaben mit Entfall-Vorbereitung gespeichert: {file_path}")
+    print(f"[MarkdownWriter] Hausaufgaben erfolgreich gespeichert: {file_path}")

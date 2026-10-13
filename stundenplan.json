@@ -1,42 +1,45 @@
 {
     "Montag": [
-        "IF",
-        "M",
-        "M",
-        "L7-1",
-        "E5",
-        "LC"
+        "Informatik",
+        "Mathematik",
+        "Mathematik",
+        "Latein",
+        "Englisch",
+        "Latein",
+        "EW",
+        "Musik",
+        "Musik"
     ],
     "Dienstag": [
-        "M",
-        "PP-2",
-        "BI",
-        "BI",
-        "L7-1",
-        "L7-1"
+        "Mathematik",
+        "Praktische Philosophie",
+        "Biologie",
+        "Biologie",
+        "Latein",
+        "Latein"
     ],
     "Mittwoch": [
-        "D",
-        "PP-2",
-        "CH",
-        "CH",
-        "EK",
-        "EK"
+        "Deutsch",
+        "Praktische Philosophie",
+        "Chemie",
+        "Chemie",
+        "Erdkunde",
+        "Erdkunde"
     ],
     "Donnerstag": [
-        "E5",
-        "E5",
-        "SP",
-        "SP",
-        "D",
-        "D",
-        "PH",
-        "PH"
+        "Englisch",
+        "Englisch",
+        "Sport",
+        "Sport",
+        "Deutsch",
+        "Deutsch",
+        "Physik",
+        "Physik"
     ],
     "Freitag": [
-        "IF",
-        "IF",
-        "GE",
-        "GE"
+        "Informatik",
+        "Informatik",
+        "Geschichte",
+        "Geschichte"
     ]
 }
