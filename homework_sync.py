@@ -78,12 +78,14 @@ def parse_and_sync_locally():
 
     md_content = "\n".join(md_lines)
 
-   # Direkt lokal in den Vault schreiben
-    LOCAL_VAULT_PATH = "/home/marlon/docker/nextcloud/data/marlon/files/orga_vault"
-    SUBFOLDER = "00 Meta/Hausaufgaben/"
+# Direkt lokal in den Vault schreiben
+    target_dir = "/home/marlon/docker/nextcloud/data/marlon/files/orga_vault/00 Meta/Hausaufgaben"
     
-    target_dir = os.path.join(LOCAL_VAULT_PATH, SUBFOLDER)
-    os.makedirs(target_dir, exist_ok=True)
+    filename = f"{iso_datum}.md"
+    file_path = os.path.join(target_dir, filename)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(md_content)
     
     filename = f"{iso_datum}.md"
     file_path = os.path.join(target_dir, filename)
