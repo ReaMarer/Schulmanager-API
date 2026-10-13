@@ -2,10 +2,10 @@ import asyncio
 import sys
 import os
 from scraper import scrape_homework
-from homework_sync import parse_and_sync_to_couchdb
+from homework_sync import parse_and_sync_locally
 
 async def main():
-    print("=== STARTING HOMEWORK SCRAPER & COUCHDB SYNC ===")
+    print("=== STARTING HOMEWORK SCRAPER & LOCAL SYNC ===")
     
     # 1. Scraper ausführen
     try:
@@ -16,15 +16,14 @@ async def main():
 
     print("\n-------------------------------------------")
     
-    # 2. Parser & CouchDB Upload ausführen
+    # 2. Parser & Lokalen Export ausführen (ohne doppelten Funktionsaufruf)
     try:
-        parse_and_sync_to_couchdb()
+        parse_and_sync_locally()
     except Exception as e:
-        print(f"\n[FEHLER] Beim CouchDB-Sync ist ein Fehler aufgetreten: {e}", file=sys.stderr)
-        # Bei einem Fehler behalten wir das HTML zur Analyse ein
+        print(f"\n[FEHLER] Beim lokalen Speichern ist ein Fehler aufgetreten: {e}", file=sys.stderr)
         return
 
-    # 3. Zentrale Bereinigung der HTML-Datei nach erfolgreichem Upload
+    # 3. HTML-Datei nach erfolgreichem Speichern löschen
     if os.path.exists("raw_homework.html"):
         os.remove("raw_homework.html")
         print("[Main] Temporäre Datei 'raw_homework.html' erfolgreich bereinigt.")
