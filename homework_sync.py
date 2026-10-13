@@ -24,7 +24,29 @@ def parse_and_sync_locally():
         print("[Sync] Fehler: 'raw_homework.html' wurde nicht gefunden.")
         return
 
-    # Die exakte Schulmanager-Tile-Struktur für das Datum finden[cite: 8]
+    # Zielpfad definieren
+    target_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
+    os.makedirs(target_dir, exist_ok=True)
+    filename = f"{iso_datum}.md"
+    file_path = os.path.join(target_dir, filename)
+
+    # Bestehende abgehakte Aufgaben einlesen (Merge-Logik)
+    completed_tasks = set()
+    if os.path.exists(file_path):
+        print(('[Sync] Existierende Datei gefunden. Lese abgehakte Aufgaben aus...'))
+        try:
+            with open(file_path, "r", encoding="utf-8") as existing_file:
+                for line in existing_file:
+                    line = line.strip()
+                    # Prüfen, ob die Zeile eine abgehakte Aufgabe ist (z.B. "- [x] ...")
+                    if line.startswith("- [x]"):
+                        # Den reinen Text ohne Checkbox und Datum extrahieren
+                        task_text = line[5:].split(" 📅")[0].strip()
+                        completed_tasks.add(task_text)
+        except Exception as e:
+            print(f"[Sync] Warnung beim Einlesen der bestehenden Datei: {e}")
+
+    # Die exakte Schulmanager-Tile-Struktur für das Datum finden
     target_tile = None
     for tile in soup.find_all("div", class_="tile"):
         header = tile.find("div", class_="tile-header")
@@ -52,7 +74,7 @@ def parse_and_sync_locally():
         ""
     ]
 
-    # Fächer und Aufgaben innerhalb der Tile auslesen[cite: 8]
+    # Fächer und Aufgaben innerhalb der Tile auslesen
     tile_body = target_tile.find("div", class_="tile-body")
     if tile_body:
         for subject_block in tile_body.find_all("div", recursive=False):
@@ -64,8 +86,10 @@ def parse_and_sync_locally():
                 task = p.text.strip() if p else "Keine Beschreibung"
 
                 if "keine ha" in task.lower() or not task:
+                    item_text = f"*{subject}: Keine HA*"
+                    checkbox_status = "x" if item_text in completed_tasks else "x"
                     md_lines.append(f"### {subject}")
-                    md_lines.append(f"- [x] *{subject}: Keine HA*")
+                    md_lines.append(f"- [{checkbox_status}] {item_text}")
                     md_lines.append("")
                     continue
 
@@ -73,27 +97,18 @@ def parse_and_sync_locally():
                 for subtask in task.split('\n'):
                     subtask = subtask.strip()
                     if subtask:
-                        md_lines.append(f"- [ ] {subtask} 📅 {iso_datum}")
+                        # Prüfen, ob diese konkrete Teilaufgabe vorher schon abgehakt war
+                        checkbox_status = "x" if item_text in completed_tasks else " "
+                        md_lines.append(f"- [{checkbox_status}] {subtask} 📅 {iso_datum}")
                 md_lines.append("")
 
     md_content = "\n".join(md_lines)
 
-# Direkt lokal in den Vault schreiben
-    target_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
-    os.makedirs(target_dir, exist_ok=True)
-    filename = f"{iso_datum}.md"
-    file_path = os.path.join(target_dir, filename)
-
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(md_content)
-    
-    filename = f"{iso_datum}.md"
-    file_path = os.path.join(target_dir, filename)
-
+    # Direkt lokal in den Vault schreiben
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    print(f"[Sync] Hausaufgaben erfolgreich lokal gespeichert: {file_path}")
+    print(f"[Sync] Hausaufgaben erfolgreich lokal gespeichert & gemerged: {file_path}")
 
 if __name__ == "__main__":
     parse_and_sync_locally()
