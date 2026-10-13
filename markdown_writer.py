@@ -153,7 +153,7 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
                 if "keine ha" in task.lower() or not task:
                     item_text = f"**{subject}**: Keine HA"
                     checkbox_status = "x" if item_text in completed_tasks else " "
-                    md_lines.append(f"- [{checkbox_status}] {item_text} 📅 {due_date_str}")
+                    md_lines.append(f"- [{checkbox_status}] {item_text} 📅 {due_date_str} ➕ {iso_datum} ⏫")
                     continue
 
                 for subtask in task.split('\n'):
@@ -161,7 +161,7 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
                     if subtask:
                         item_text = f"**{subject}**: {subtask}"
                         checkbox_status = "x" if item_text in completed_tasks else " "
-                        md_lines.append(f"- [{checkbox_status}] {item_text} 📅 {due_date_str}")
+                        md_lines.append(f"- [{checkbox_status}] {item_text} 📅 {due_date_str} ➕ {iso_datum} ⏫")
         
         md_lines.append("")
 
