@@ -25,7 +25,7 @@ def parse_and_sync_locally():
         return
 
     # Zielpfad definieren
-    target_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
+    target_dir = "/home/marlon/orga_vault_temp/01 Meta/Hausaufgaben"
     os.makedirs(target_dir, exist_ok=True)
     filename = f"{iso_datum}.md"
     file_path = os.path.join(target_dir, filename)
