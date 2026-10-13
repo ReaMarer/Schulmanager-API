@@ -38,9 +38,8 @@ def parse_and_sync_locally():
             with open(file_path, "r", encoding="utf-8") as existing_file:
                 for line in existing_file:
                     line = line.strip()
-                    # Prüfen, ob die Zeile eine abgehakte Aufgabe ist (z.B. "- [x] ...")
                     if line.startswith("- [x]"):
-                        # Den reinen Text ohne Checkbox und Datum extrahieren
+                        # Den reinen Text ohne Checkbox und Datums-Tags extrahieren
                         task_text = line[5:].split(" 📅")[0].strip()
                         completed_tasks.add(task_text)
         except Exception as e:
@@ -58,7 +57,7 @@ def parse_and_sync_locally():
         print(f"[Sync] Keine Hausaufgaben für {heutiges_ziel_datum} gefunden. Breche ab.")
         return
 
-    # Markdown-Inhalt generieren
+    # Markdown-Inhalt generieren mit Frontmatter für Dataview
     md_lines = [
         "---",
         f"date: {iso_datum}",
@@ -86,21 +85,20 @@ def parse_and_sync_locally():
                 task = p.text.strip() if p else "Keine Beschreibung"
 
                 if "keine ha" in task.lower() or not task:
-                    item_text = f"*{subject}: Keine HA*"
-                    checkbox_status = "x" if item_text in completed_tasks else "x"
-                    md_lines.append(f"### {subject}")
-                    md_lines.append(f"- [{checkbox_status}] {item_text}")
-                    md_lines.append("")
+                    item_text = f"**{subject}**: Keine HA"
+                    checkbox_status = "x" if item_text in completed_tasks else " "
+                    md_lines.append(f"- [{checkbox_status}] {item_text} 📅 {iso_datum}")
                     continue
 
-                md_lines.append(f"### {subject}")
                 for subtask in task.split('\n'):
                     subtask = subtask.strip()
                     if subtask:
-                        # Prüfen, ob diese konkrete Teilaufgabe vorher schon abgehakt war
+                        # Fach und Aufgabe direkt in der Zeile kombinieren für perfekte Kompatibilität
+                        item_text = f"**{subject}**: {subtask}"
                         checkbox_status = "x" if item_text in completed_tasks else " "
-                        md_lines.append(f"- [{checkbox_status}] {subtask} 📅 {iso_datum}")
-                md_lines.append("")
+                        md_lines.append(f"- [{checkbox_status}] {item_text} 📅 {iso_datum}")
+        
+        md_lines.append("")
 
     md_content = "\n".join(md_lines)
 
