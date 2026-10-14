@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-./venv/bin/python3 main.py >> cron.log 2>&1
+# Zum Projektverzeichnis wechseln
 cd /home/marlon/Schulmanager-API
 
-python3 main.py
+# Python-Skript über die virtuelle Umgebung ausführen
+./venv/bin/python3 main.py >> cron.log 2>&1
 
 # Zielverzeichnis in Nextcloud sicherstellen
 sudo mkdir -p "/home/marlon/docker/nextcloud/data/marlon/files/orga_vault/00 Meta/Hausaufgaben/"
