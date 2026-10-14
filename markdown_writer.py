@@ -54,12 +54,25 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
 
     current_date_obj = datetime.strptime(iso_datum, "%Y-%m-%d")
 
-    # 1. Bestehende Aufgaben und deren Status (abgehakt [x] oder offen [ ]) auslesen
+def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
+    # Echter Nextcloud-Pfad zum Einlesen bereits abgehakter Aufgaben
+    vault_dir = "/home/marlon/docker/nextcloud/data/marlon/files/orga_vault/00 Meta/Hausaufgaben"
+    filename = f"{iso_datum}.md"
+    vault_file_path = os.path.join(vault_dir, filename)
+
+    # Temporärer Pfad zum Erstellen der neuen Datei
+    target_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
+    os.makedirs(target_dir, exist_ok=True)
+    temp_file_path = os.path.join(target_dir, filename)
+
+    current_date_obj = datetime.strptime(iso_datum, "%Y-%m-%d")
+
+    # 1. Bestehende Aufgaben und deren Status direkt AUS DEM ECHTEN VAULT auslesen!
     existing_task_status = {}
-    if os.path.exists(file_path):
+    if os.path.exists(vault_file_path):
         print('[MarkdownWriter] Existierende Datei im Vault gefunden. Lese Status ein...')
         try:
-            with open(file_path, "r", encoding="utf-8") as existing_file:
+            with open(vault_file_path, "r", encoding="utf-8") as existing_file:
                 for line in existing_file:
                     line = line.strip()
                     if line.startswith("- [") and "] " in line:
@@ -122,8 +135,8 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
 
     md_content = "\n".join(md_lines)
 
-    # In die Datei schreiben
-    with open(file_path, "w", encoding="utf-8") as f:
+   # In die temporäre Datei schreiben (von wo sie die run.sh sicher abholt)
+    with open(temp_file_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    print(f"[MarkdownWriter] Hausaufgaben intelligent aktualisiert: {file_path}")
+    print(f"[MarkdownWriter] Hausaufgaben intelligent aktualisiert: {temp_file_path}")
