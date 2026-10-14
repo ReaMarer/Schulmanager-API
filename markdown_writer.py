@@ -46,19 +46,15 @@ def get_next_lesson_date(current_date_obj, subject):
     return current_date_obj + timedelta(days=1)
 
 def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
-    # 1. Echter Nextcloud-Pfad zum Einlesen bereits abgehakter Aufgaben
+    # Direkt in den echten Nextcloud-Vault-Pfad schreiben
     vault_dir = "/home/marlon/docker/nextcloud/data/marlon/files/orga_vault/00 Meta/Hausaufgaben"
+    os.makedirs(vault_dir, exist_ok=True)
     filename = f"{iso_datum}.md"
     vault_file_path = os.path.join(vault_dir, filename)
 
-    # 2. Temporärer Pfad zum Erstellen der neuen Datei für den Kopiervorgang
-    target_temp_dir = "/home/marlon/orga_vault_temp/00 Meta/Hausaufgaben"
-    os.makedirs(target_temp_dir, exist_ok=True)
-    temp_file_path = os.path.join(target_temp_dir, filename)
-
     current_date_obj = datetime.strptime(iso_datum, "%Y-%m-%d")
 
-    # 3. Bestehende Aufgaben und deren Status robuster auslesen
+    # 1. Bestehende Aufgaben und deren Status direkt aus der Zieldatei einlesen
     existing_task_status = {}
     if os.path.exists(vault_file_path):
         print('[MarkdownWriter] Existierende Datei im Vault gefunden. Lese Status ein...')
@@ -68,7 +64,6 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
                     line = line.strip()
                     if line.startswith("- [") and "] " in line:
                         status = line[3:4] # 'x' oder ' '
-                        # Extrahiere den reinen Text bis zum ersten Emoji (z. B. 📅)
                         task_part = line[5:]
                         for emoji in [" 📅", " ➕", " ⏫", " 🔽", " ⏳"]:
                             if emoji in task_part:
@@ -78,7 +73,7 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
         except Exception as e:
             print(f"[MarkdownWriter] Warnung beim Einlesen: {e}")
 
-    # 4. Aktuelle Aufgaben aus der Website-Kachel parsen
+    # 2. Aktuelle Aufgaben aus der Website-Kachel parsen
     new_tasks_found = []
     tile_body = target_tile.find("div", class_="tile-body")
     if tile_body:
@@ -103,15 +98,13 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
                         item_text = f"**{subject}**: {subtask}"
                         new_tasks_found.append((item_text, due_date_str))
 
-    # 5. Smartes Zusammenführen mit Fallback auf exakten oder teilweisen Match
+    # 3. Smartes Zusammenführen
     final_task_lines = []
     for item_text, due_date_str in new_tasks_found:
         status = " "
-        # Exakter Match oder Suche nach dem Fach-Präfix, falls sich der Text minimal geändert hat
         if item_text in existing_task_status:
             status = existing_task_status[item_text]
         else:
-            # Fallback: Prüfen, ob der Aufgabentext (ohne Datum/Metadaten) schon mal da war
             for old_task, old_status in existing_task_status.items():
                 if item_text == old_task:
                     status = old_status
@@ -119,7 +112,7 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
         
         final_task_lines.append(f"- [{status}] {item_text} 📅 {due_date_str} ➕ {iso_datum} ⏫")
 
-    # 6. Markdown-Inhalt zusammenbauen
+    # 4. Markdown-Inhalt zusammenbauen
     md_lines = [
         "---",
         f"date: {iso_datum}",
@@ -133,8 +126,8 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
 
     md_content = "\n".join(md_lines)
 
-    # 7. In die temporäre Datei schreiben
-    with open(temp_file_path, "w", encoding="utf-8") as f:
+    # 5. Direkt in die Vault-Datei schreiben
+    with open(vault_file_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    print(f"[MarkdownWriter] Hausaufgaben intelligent aktualisiert: {temp_file_path}")
+    print(f"[MarkdownWriter] Hausaufgaben direkt aktualisiert: {vault_file_path}")
