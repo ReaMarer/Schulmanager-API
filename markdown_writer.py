@@ -13,25 +13,6 @@ def load_json_safely(filename):
         print(f"[MarkdownWriter] Warnung beim Laden von '{filename}': {e}")
         return None
 
-def is_lesson_cancelled(check_date_str, subject):
-    """
-    [ZUKUNFTS-ANSAATZ] Prüft, ob ein Fach an einem bestimmten Datum entfällt.
-    Aktuell liest es optional eine 'entfall.json' aus (falls vorhanden) 
-    und gibt standardmäßig False zurück, solange nichts eingetragen ist.
-    """
-    entfall_data = load_json_safely("entfall.json")
-    if not entfall_data:
-        return False
-        
-    # Prüfen, ob für das Datum Ausfälle eingetragen sind
-    if check_date_str in entfall_data:
-        ausgefallene_faecher = entfall_data[check_date_str]
-        if subject in ausgefallene_faecher:
-            print(f"[Entfall-Check] Fach '{subject}' fällt am {check_date_str} aus (Überspringe Termin).")
-            return True
-            
-    return False
-
 def get_next_lesson_date(current_date_obj, subject):
     """
     Ermittelt das Datum der nächsten Unterrichtsstunde basierend auf der stundenplan.json.
@@ -75,18 +56,7 @@ def get_next_lesson_date(current_date_obj, subject):
         # Wochenende überspringen (Samstag=5, Sonntag=6)
         if check_weekday_index >= 5:
             continue
-            
-        weekday_name = wochentage_mapping.get(check_weekday_index)
         
-        # 1. Prüfen, ob das Fach überhaupt an diesem Wochentag laut Stundenplan stattfindet
-        if weekday_name in stundenplan and mapped_subject in stundenplan[weekday_name]:
-            
-            # 2. [ZUKUNFTS-ANSAATZ] Hier greift die Entfall-Prüfung
-            if is_lesson_cancelled(check_date_str, mapped_subject):
-                continue # Überspringt diesen Tag und sucht den nächsten gültigen Termin
-                
-            return check_date
-
     # Fallback, falls das Fach in den nächsten 3 Wochen gar nicht auftaucht (oder alles ausfällt)
     return current_date_obj + timedelta(days=1)
 
@@ -129,10 +99,6 @@ def write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile):
         "  - hausaufgaben",
         "---",
         f"# 📚 Hausaufgaben für {heutiges_ziel_datum}",
-        "",
-        "> Automatisch synchronisiert vom Schulmanager-Online.",
-        "",
-        ""
     ]
 
     # Fächer und Aufgaben innerhalb der Tile auslesen
