@@ -1,6 +1,6 @@
 from datetime import datetime
 from bs4 import BeautifulSoup
-from markdown_writer import write_homework_markdown  # Import der neuen Datei
+from markdown_writer import write_homework_markdown
 
 def parse_and_sync_locally():
     wochentage = {
@@ -8,12 +8,13 @@ def parse_and_sync_locally():
         "Thursday": "Donnerstag", "Friday": "Freitag", "Saturday": "Samstag",
         "Sunday": "Sonntag"
     }
-    heute_eng = datetime.now().strftime("%A")
+    now = datetime.now()
+    heute_eng = now.strftime("%A")
     heute_de = wochentage.get(heute_eng, "Montag")
-    datum_str = datetime.now().strftime("%d.%m.%Y")
+    datum_str = now.strftime("%d.%m.%Y")
     heutiges_ziel_datum = f"{heute_de}, {datum_str}"
     
-    iso_datum = datetime.now().strftime("%Y-%m-%d")
+    iso_datum = now.strftime("%Y-%m-%d")
 
     print(f"[Sync] Starte Analyse für: {heutiges_ziel_datum}")
 
@@ -24,29 +25,27 @@ def parse_and_sync_locally():
         print("[Sync] Fehler: 'raw_homework.html' wurde nicht gefunden.")
         return
 
-    target_tile = soup.find("div", class_="classbook-homework-tile") # Oder einfach class_="tile"
-    if not target_tile:
-        print("[Sync] Keine Hausaufgaben-Kacheln im HTML gefunden. Breche ab.")
+    # Auf der Website heißen die Kacheln schlicht "tile"
+    tiles = soup.find_all("div", class_="tile")
+    if not tiles:
+        print("[Sync] Keine Hausaufgaben-Kacheln (div.tile) im HTML gefunden. Breche ab.")
         return
         
-    # Extrahiere das echte Datum aus der gefundenen Kachel
-    header = target_tile.find("div", class_="tile-header")
-    if header:
-        heutiges_ziel_datum = header.text.strip()
-        # Versuche das Datum aus dem Header zu extrahieren (Format: "Wochentag, DD.MM.YYYY")
-        try:
-            raw_date = heutiges_ziel_datum.split(",")[1].strip()
-            date_obj = datetime.strptime(raw_date, "%d.%m.%Y")
-            iso_datum = date_obj.strftime("%Y-%m-%d")
-        except Exception:
-            print("[Sync] Konnte Datum aus Header nicht parsen. Nutze aktuelles Tagesdatum.")
-
+    target_tile = None
+    
+    # Gehe alle Kacheln durch und finde die mit dem heutigen Datum
+    for tile in tiles:
+        header = tile.find("div", class_="tile-header")
+        if header and datum_str in header.text:
+            target_tile = tile
+            heutiges_ziel_datum = header.text.strip()
+            break
 
     if not target_tile:
-        print(f"[Sync] Keine Hausaufgaben für {heutiges_ziel_datum} gefunden. Breche ab.")
+        print(f"[Sync] Keine Hausaufgaben-Kachel für heute ({datum_str}) gefunden. Breche ab.")
         return
 
-    # Übergabe an das Markdown-Writer Skript
+    # Übergabe an das Markdown-Writer Skript (iso_datum bleibt fix das heutige Datum)
     write_homework_markdown(iso_datum, heutiges_ziel_datum, target_tile)
 
 if __name__ == "__main__":
