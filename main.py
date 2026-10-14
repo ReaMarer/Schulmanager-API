@@ -5,16 +5,13 @@ from scraper import scrape_homework
 from homework_sync import parse_and_sync_locally
 
 async def main():
-    print("=== STARTING HOMEWORK SCRAPER & LOCAL SYNC ===")
+    print("started reading homework.")
     
-    # 1. Scraper ausführen
     try:
         await scrape_homework()
     except Exception as e:
         print(f"\n[FEHLER] Beim Scrapen ist ein Fehler aufgetreten: {e}", file=sys.stderr)
         return
-
-    print("\n-------------------------------------------")
     
     # 2. Parser & Lokalen Export ausführen (ohne doppelten Funktionsaufruf)
     try:
