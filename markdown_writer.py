@@ -50,13 +50,20 @@ def get_next_lesson_date(current_date_obj, subject):
     # Suche bis zu 21 Tage (3 Wochen) in die Zukunft
     for i in range(1, 22):
         check_date = current_date_obj + timedelta(days=i)
-        check_date_str = check_date.strftime("%Y-%m-%d")
         check_weekday_index = check_date.weekday()
         
-        # Wochenende überspringen (Samstag=5, Sonntag=6)
+        # Wochenende überspringen
         if check_weekday_index >= 5:
             continue
+            
+        wochentag_de = wochentage_mapping[check_weekday_index]
+        faecher_an_dem_tag = stundenplan.get(wochentag_de, [])
         
+        # WICHTIG: Wenn das Fach an diesem Tag existiert, gib das Datum zurück!
+        if mapped_subject in faecher_an_dem_tag:
+            return check_date
+
+
     # Fallback, falls das Fach in den nächsten 3 Wochen gar nicht auftaucht (oder alles ausfällt)
     return current_date_obj + timedelta(days=1)
 

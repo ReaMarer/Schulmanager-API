@@ -24,13 +24,23 @@ def parse_and_sync_locally():
         print("[Sync] Fehler: 'raw_homework.html' wurde nicht gefunden.")
         return
 
-    # Die exakte Schulmanager-Tile-Struktur für das Datum finden
-    target_tile = None
-    for tile in soup.find_all("div", class_="tile"):
-        header = tile.find("div", class_="tile-header")
-        if header and heutiges_ziel_datum in header.text:
-            target_tile = tile
-            break
+    target_tile = soup.find("div", class_="classbook-homework-tile") # Oder einfach class_="tile"
+    if not target_tile:
+        print("[Sync] Keine Hausaufgaben-Kacheln im HTML gefunden. Breche ab.")
+        return
+        
+    # Extrahiere das echte Datum aus der gefundenen Kachel
+    header = target_tile.find("div", class_="tile-header")
+    if header:
+        heutiges_ziel_datum = header.text.strip()
+        # Versuche das Datum aus dem Header zu extrahieren (Format: "Wochentag, DD.MM.YYYY")
+        try:
+            raw_date = heutiges_ziel_datum.split(",")[1].strip()
+            date_obj = datetime.strptime(raw_date, "%d.%m.%Y")
+            iso_datum = date_obj.strftime("%Y-%m-%d")
+        except Exception:
+            print("[Sync] Konnte Datum aus Header nicht parsen. Nutze aktuelles Tagesdatum.")
+
 
     if not target_tile:
         print(f"[Sync] Keine Hausaufgaben für {heutiges_ziel_datum} gefunden. Breche ab.")
