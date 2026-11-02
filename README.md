@@ -54,7 +54,7 @@ tags:
 ## Installation
 
 ```bash
-cd /home/marlon/Schulmanager-API-2
+cd ~/Schulmanager-API-2
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -87,8 +87,8 @@ SCHULMANAGER_EMAIL=deine.email@example.com
 SCHULMANAGER_PASSWORD=dein-passwort
 SCHULMANAGER_HEADLESS=true
 
-NEXTCLOUD_DAV_BASE=http://127.0.0.1:8080/remote.php/dav/files/marlon/orga_vault/00%20Meta/Hausaufgaben
-NEXTCLOUD_USER=marlon
+NEXTCLOUD_DAV_BASE=http://127.0.0.1:8080/remote.php/dav/files/DEIN_NEXTCLOUD_BENUTZER/orga_vault/00%20Meta/Hausaufgaben
+NEXTCLOUD_USER=dein-nextcloud-benutzer
 NEXTCLOUD_PASSWORD=dein-nextcloud-passwort
 ```
 
@@ -106,8 +106,8 @@ Unterstuetzte Umgebungsvariablen:
 | `NEXTCLOUD_USER` | Nextcloud-Benutzername | – |
 | `NEXTCLOUD_PASSWORD` | Nextcloud-Passwort/App-Passwort | – |
 
-Auf dem Server zeigt `NEXTCLOUD_DAV_BASE` auf `127.0.0.1:8080`; aus dem LAN ist
-die Nextcloud unter `http://100.71.43.93:8080` erreichbar.
+Auf dem Server kann `NEXTCLOUD_DAV_BASE` auf `127.0.0.1:8080` zeigen; aus dem LAN
+die IP-Adresse oder den Hostnamen der Nextcloud verwenden.
 
 ## Verwendung
 
@@ -167,10 +167,10 @@ Export laeuft auch dann, wenn der Scraper fehlschlaegt, damit bereits
 vorhandene Datenbankeintraege trotzdem in die Notiz gelangen. Ein `flock`
 verhindert parallele Laeufe.
 
-Crontab des Benutzers `marlon`:
+Crontab des Benutzers (Beispiel):
 
 ```cron
-0 * * * * /bin/bash /home/marlon/Schulmanager-API-2/run_hourly.sh >> /home/marlon/Schulmanager-API-2/cron.log 2>&1
+0 * * * * /bin/bash /home/BENUTZER/Schulmanager-API-2/run_hourly.sh >> /home/BENUTZER/Schulmanager-API-2/cron.log 2>&1
 ```
 
 Installation:
@@ -181,14 +181,14 @@ crontab -e
 ```
 
 Der frueher benutzte Root-Cronjob
-(`/home/marlon/Schulmanager-API/run.sh`) ist deaktiviert. Der neue Job laeuft
-bewusst als Benutzer `marlon`, damit WebDAV-Zugangsdaten und Projektdateien
+(`/home/BENUTZER/Schulmanager-API/run.sh`) ist deaktiviert. Der neue Job laeuft
+bewusst als normaler Benutzer, damit WebDAV-Zugangsdaten und Projektdateien
 nicht als Root verarbeitet werden.
 
 Logs pruefen:
 
 ```bash
-tail -f /home/marlon/Schulmanager-API-2/cron.log
+tail -f ~/Schulmanager-API-2/cron.log
 ```
 
 ## Datenbankschema
