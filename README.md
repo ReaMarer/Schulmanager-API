@@ -1,4 +1,4 @@
-# Schulmanager-API-2
+# Schulmanager-API
 
 Automatisierte Hausaufgaben-Synchronisation fuer **Schulmanager Online** und
 Obsidian:
@@ -54,7 +54,7 @@ tags:
 ## Installation
 
 ```bash
-cd ~/Schulmanager-API-2
+cd ~/Schulmanager-API
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -170,7 +170,7 @@ verhindert parallele Laeufe.
 Crontab des Benutzers (Beispiel):
 
 ```cron
-0 * * * * /bin/bash /home/BENUTZER/Schulmanager-API-2/run_hourly.sh >> /home/BENUTZER/Schulmanager-API-2/cron.log 2>&1
+0 * * * * /bin/bash /home/BENUTZER/Schulmanager-API/run_hourly.sh >> /home/BENUTZER/Schulmanager-API/cron.log 2>&1
 ```
 
 Installation:
@@ -180,15 +180,14 @@ crontab -e
 # obige Zeile einfuegen und speichern
 ```
 
-Der frueher benutzte Root-Cronjob
-(`/home/BENUTZER/Schulmanager-API/run.sh`) ist deaktiviert. Der neue Job laeuft
+Ein frueherer Root-Cronjob ist deaktiviert. Der neue Job laeuft
 bewusst als normaler Benutzer, damit WebDAV-Zugangsdaten und Projektdateien
 nicht als Root verarbeitet werden.
 
 Logs pruefen:
 
 ```bash
-tail -f ~/Schulmanager-API-2/cron.log
+tail -f ~/Schulmanager-API/cron.log
 ```
 
 ## Datenbankschema
