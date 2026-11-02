@@ -218,3 +218,18 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Schulmanager-API-2
+hausaufgaben.db
+hausaufgaben.db-*
+debug/
+dump*.html
+*.sqlite
+*.sqlite3
+
+.pytest_cache/
+
+# Laufzeitdateien der stündlichen Automatisierung
+cron.log
+.run_hourly.lock
+backups/
